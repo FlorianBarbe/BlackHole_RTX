@@ -14,4 +14,8 @@ public:
     }
 
     void draw3D() const;
+
+    float getRayon() const { return rayon; }
+
 };
+

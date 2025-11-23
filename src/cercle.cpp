@@ -13,7 +13,7 @@ void cercle::draw3D() const
     const int slices = 32;
     const int stacks = 32;
 
-    glColor3f(r, g, b);
+    glColor3f(r, g, b)
 
     for (int i = 0; i < stacks; ++i)
     {

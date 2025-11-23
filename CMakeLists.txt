@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.10)
+﻿cmake_minimum_required(VERSION 3.10)
 project(BlackHole)
 
 set(CMAKE_CXX_STANDARD 17)
@@ -13,25 +13,26 @@ include_directories(
 
 # --- Library paths ---
 link_directories(
-    ${PROJECT_SOURCE_DIR}/libs/glew/lib
+    ${PROJECT_SOURCE_DIR}/libs/glew/lib/x64
     ${PROJECT_SOURCE_DIR}/libs/glfw/lib-vc2022
 )
 
 # --- Source files ---
-file(GLOB SRC_FILES src/*.cpp)
+set(SRC_FILES
+    src/main_gpu.cpp
+    src/cercle.cpp
+    src/rayon.cpp
+    src/utilities.cpp
+)
 
-# --- Single executable definition ---
-add_executable(BlackHole
-    ${SRC_FILES}
-    "include/rayon.h"
-    include/cercle.h
- "include/utilities.h" "src/utilities.cpp" "src/rayon.cpp")
+add_executable(BlackHole ${SRC_FILES})
 
-# --- Link GLFW ---
-target_link_libraries(BlackHole glfw3)
-
-# --- Link OpenGL ---
-target_link_libraries(BlackHole opengl32)
-
-# --- Required for static GLEW ---
+# --- Static GLEW ---
 add_definitions(-DGLEW_STATIC)
+
+# --- Linking ---
+target_link_libraries(BlackHole
+    glew32s        # GLEW static release (x64)
+    glfw3
+    opengl32
+)
