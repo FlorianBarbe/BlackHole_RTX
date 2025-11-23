@@ -1,34 +1,44 @@
-#include <utilities.h>
+﻿#define _USE_MATH_DEFINES
+#include <cmath>
+#include <glm/glm.hpp>
 
+#include "utilities.h"
+#include "rayon.h"
+#include "cercle.h"
 
+// ---------------------------------------------------------
+//   PHYSIQUE 3D : update du rayon
+// ---------------------------------------------------------
 
-glm::vec2 OpenGLtoPolar(float x, float y){
-    float R = sqrt(x * x + y * y);
-    float theta = atan2f(y, x);
-    return glm::vec2(R,theta);//(R,theta)
-} 
-
-void update(float dt, rayon& r, cercle& c)
+void update(float dt, rayon& r, const cercle& c)
 {
-    if (r.isAbsorbed()) return; // NE PLUS RIEN FAIRE
+    if (r.isAbsorbed()) return;
 
-    glm::vec2 polar = OpenGLtoPolar(r.getX(), r.getY());
-    float R = polar.x;
+    glm::vec3 pos = r.pos();
+    glm::vec3 dir = r.dir();
 
-    if (R < c.getrlim()) {
+    // distance au trou noir
+    glm::vec3 diff = pos - glm::vec3(c.cx, c.cy, c.cz);
+    float R = glm::length(diff);
+
+    // absorption ?
+    if (R < c.rayon)
+    {
         r.setAbsorbed(true);
         return;
     }
 
-    // physique normale�
-    float ax = -c.getm() * r.getX() / (R * R * R);
-    float ay = -c.getm() * r.getY() / (R * R * R);
+    // gravité newtonienne 3D
+    float G = 1.0f;
+    glm::vec3 accel = -G * c.masse * diff / (R * R * R);
 
-    r.setdx(r.getdx() + ax * dt);
-    r.setdy(r.getdy() + ay * dt);
+    // intégration Euler
+    dir += accel * dt;
+    pos += dir * dt;
 
-    r.setX(r.getX() + r.getdx() * dt);
-    r.setY(r.getY() + r.getdy() * dt);
+    // mise à jour
+    r.dir() = dir;
+    r.pos() = pos;
 
-    r.addPoint();
+    r.addPoint(pos);
 }

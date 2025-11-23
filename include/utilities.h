@@ -1,8 +1,5 @@
-#include <cmath>
-#include <glm/glm.hpp>
-#include "cercle.h"
+#pragma once
 #include "rayon.h"
+#include "cercle.h"
 
-glm::vec2 OpenGLtoPolar(float xr, float yr);
-
-void update(float dt, rayon& r, cercle& c);
+void update(float dt, rayon& r, const cercle& c);

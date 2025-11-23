@@ -1,22 +1,16 @@
+ï»¿// rayon.cpp
 #include "rayon.h"
+#include <GLFW/glfw3.h>
 
-
-
-void rayon::draw() const
+void rayon::draw3D() const
 {
-    float ratio = (float)L / (float)H;
+    if (trail.empty()) return;
 
-    // point du rayon
-    glColor3f(r, g, b);
-    glBegin(GL_POINTS);
-    glVertex2f(xr / ratio, yr);
-    glEnd();
-
-    // traînée
+    glColor3f(color.r, color.g, color.b);
     glBegin(GL_LINE_STRIP);
-    for (const auto& p : trail) {
-        glVertex2f(p.x / ratio, p.y);
-    }
+
+    for (const glm::vec3& p : trail)
+        glVertex3f(p.x, p.y, p.z);
+
     glEnd();
 }
-

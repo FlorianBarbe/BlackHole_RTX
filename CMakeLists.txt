@@ -23,7 +23,7 @@ file(GLOB SRC_FILES src/*.cpp)
 # --- Single executable definition ---
 add_executable(BlackHole
     ${SRC_FILES}
-    include/rayon.h
+    "include/rayon.h"
     include/cercle.h
  "include/utilities.h" "src/utilities.cpp" "src/rayon.cpp")
 
