@@ -336,6 +336,10 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\data\Capture d%27écran 2025-12-02 222558.png" />
+    <Image Include="..\data\capture1.png" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

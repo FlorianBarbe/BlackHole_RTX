@@ -4,165 +4,178 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include <vector>
+#include <random>
 #include <cstdio>
 
 #include "rayon.h"
 #include "cercle.h"
 #include "utilities.h"
-#include "raygen.h"
 
 #define _USE_MATH_DEFINES
 #include <cmath>
 const float M_PI = 3.14159265358979323846f;
 
-
-
+// =============================
+//   CAMERA ORBITALE
+// =============================
 static float g_yaw = 0.0f;
 static float g_pitch = 0.0f;
 
 void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 {
-    static double lastX = xpos;
-    static double lastY = ypos;
+	static double lastX = xpos;
+	static double lastY = ypos;
 
-    double dx = xpos - lastX;
-    double dy = ypos - lastY;
+	double dx = xpos - lastX;
+	double dy = ypos - lastY;
 
-    lastX = xpos;
-    lastY = ypos;
+	lastX = xpos;
+	lastY = ypos;
 
-    g_yaw += dx * 0.003f;
-    g_pitch += dy * 0.003f;
+	g_yaw += dx * 0.003f;
+	g_pitch += dy * 0.003f;
 
-    if (g_pitch > 1.4f) g_pitch = 1.4f;
-    if (g_pitch < -1.4f) g_pitch = -1.4f;
+	if (g_pitch > 1.4f) g_pitch = 1.4f;
+	if (g_pitch < -1.4f) g_pitch = -1.4f;
 }
 
+
+// ============================================================
+//                     MAIN
+// ============================================================
 int main()
 {
-    // =========================
-    // 1. INIT GLFW + GLEW
-    // =========================
-    if (!glfwInit()) return -1;
+	// =========================
+	// 1. INIT GLFW + GLEW
+	// =========================
+	if (!glfwInit()) return -1;
 
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
 
-    GLFWwindow* window = glfwCreateWindow(1280, 720, "Black Hole – Scene 3D + Rays", nullptr, nullptr);
-    if (!window) { glfwTerminate(); return -1; }
+	GLFWwindow* window = glfwCreateWindow(2560, 1080, "Black Hole – Screen Rays", nullptr, nullptr);
+	if (!window) { glfwTerminate(); return -1; }
 
-    glfwMakeContextCurrent(window);
-    glfwSetCursorPosCallback(window, mouse_callback);
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	glfwMakeContextCurrent(window);
+	glfwSetCursorPosCallback(window, mouse_callback);
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
-    glewInit();
+	glewInit();
+	glEnable(GL_DEPTH_TEST);
 
-    glEnable(GL_DEPTH_TEST);
 
-    // =========================
-    // 2. CAMERA
-    // =========================
-    float distance = 6.0f; // distance caméra -> centre
+	// =========================
+	// 2. CAMERA
+	// =========================
+	float camDist = 8.0f;
 
-    // Projection perspective
-    glm::mat4 proj = glm::perspective(glm::radians(60.0f), 1280.f / 720.f, 0.1f, 200.0f);
+	glm::mat4 proj = glm::perspective(glm::radians(60.0f), 2560.f / 1080.f, 0.1f, 200.0f);
 
-    // =========================
-    // 3. OBJET CENTRAL (TROU NOIR)
-    // =========================
-    cercle blackHole(0.0f, 0.0f, 0.0f, 0.4f, 0.1f);
 
-    // =========================
-    // 4. GÉNÉRATION DES RAYONS AUTOUR
-    // =========================
-    std::vector<rayon> rays;
+	// =========================
+	// 3. BLACK HOLE
+	// =========================
+	cercle blackHole(0.0f, 0.0f, 0.0f, 0.45f, 0.1f);
 
-    int Ntheta = 35;
-    int Nphi = 35;
-    float R0 = 3.0f; // rayon de départ des rayons
 
-    for (int it = 0; it < Ntheta; ++it)
-    {
-        float theta = (float)it / (Ntheta - 1) * M_PI;
+	// =========================
+	// 4. ÉCRAN RECTANGULAIRE
+	// =========================
+	std::vector<rayon> rays;
 
-        for (int ip = 0; ip < Nphi; ++ip)
-        {
-            float phi = (float)ip / (Nphi - 1) * 2.0f * M_PI;
+	int Nx = 20;     // résolution horizontale
+	int Ny = 20;     // résolution verticale
 
-            glm::vec3 origin(
-                R0 * sin(theta) * cos(phi),
-                R0 * sin(theta) * sin(phi),
-                R0 * cos(theta)
-            );
+	float W = 6.0f;   // largeur physique de l'écran
+	float H = 4.0f;   // hauteur physique
+	float Z0 = 4.0f;  // position écran sur l’axe Z
 
-            glm::vec3 dir = glm::normalize(-origin); // vers le centre
+	float dx = W / Nx;
+	float dy = H / Ny;
 
-            rays.emplace_back(origin, dir, glm::vec3(1, 1, 1));
-        }
-    }
+	glm::vec3 screenCenter(0.0f, 0.0f, Z0);
+	glm::vec3 right(1.0f, 0.0f, 0.0f);
+	glm::vec3 up(0.0f, 1.0f, 0.0f);
 
-    float dt = 0.01f;
+	// ============================================
+	// Génération des rayons "un par pixel"
+	// ============================================
+	for (int j = 0; j < Ny; ++j)
+	{
+		for (int i = 0; i < Nx; ++i)
+		{
+			float u = (i + 0.5f) * dx - W * 0.5f;
+			float v = (j + 0.5f) * dy - H * 0.5f;
 
-    // =========================
-    // 5. MAIN LOOP
-    // =========================
-    while (!glfwWindowShouldClose(window))
-    {
-        glfwPollEvents();
+			glm::vec3 origin = screenCenter + u * right + v * up;
 
-        // ----------- CAMÉRA ORBITALE -----------
-        glm::vec3 camPos;
-        camPos.x = distance * cos(g_pitch) * sin(g_yaw);
-        camPos.y = distance * sin(g_pitch);
-        camPos.z = distance * cos(g_pitch) * cos(g_yaw);
+			// direction vers le trou noir
+			glm::vec3 dir = glm::normalize(glm::vec3(0, 0, -1));// - origin);
 
-        glm::mat4 view = glm::lookAt(
-            camPos,
-            glm::vec3(0, 0, 0),
-            glm::vec3(0, 1, 0)
-        );
+			rays.emplace_back(origin, dir, glm::vec3(1, 1, 1));
+		}
+	}
 
-        // ----------- CLEAR -----------
-        glClearColor(0, 0, 0, 1);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	float dt = 0.01f;
 
-        // ----------- MATRICES OPENGL FIXED PIPELINE -----------
-        glMatrixMode(GL_PROJECTION);
-        glLoadMatrixf(&proj[0][0]);
 
-        glMatrixMode(GL_MODELVIEW);
-        glLoadMatrixf(&view[0][0]);
+	// =========================
+	// 5. MAIN LOOP
+	// =========================
+	while (!glfwWindowShouldClose(window))
+	{
+		glfwPollEvents();
 
-        // =========================
-        // DESSIN TROU NOIR
-        // =========================
-        blackHole.draw3D();
+		// ---------- caméra orbitale ----------
+		glm::vec3 camPos;
+		camPos.x = camDist * cos(g_pitch) * sin(g_yaw);
+		camPos.y = camDist * sin(g_pitch);
+		camPos.z = camDist * cos(g_pitch) * cos(g_yaw);
 
-        // =========================
-        // DESSIN RAYONS (lignes blanches)
-        // =========================
+		glm::mat4 view = glm::lookAt(
+			camPos,
+			glm::vec3(0, 0, 0),
+			glm::vec3(0, 1, 0)
+		);
 
-        glColor3f(1, 1, 1);
-        glLineWidth(1.5f);
+		glClearColor(0, 0, 0, 1);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        for (auto& r : rays)
-        {
-            // Mise à jour physique
-            update(dt, r, blackHole);
+		glMatrixMode(GL_PROJECTION);
+		glLoadMatrixf(&proj[0][0]);
 
-            // Tracé
-            glBegin(GL_LINE_STRIP);
-            for (auto& p : r.getTrail())
-                glVertex3fv(&p.x);
-            glEnd();
+		glMatrixMode(GL_MODELVIEW);
+		glLoadMatrixf(&view[0][0]);
 
-            // Ajout du point actuel dans la trace
-            r.addPoint(r.pos());
-        }
 
-        glfwSwapBuffers(window);
-    }
+		// =========================
+		// Black hole (NOIR)
+		// =========================
+		glColor3f(0, 0, 0);
+		blackHole.draw3D();
 
-    glfwTerminate();
-    return 0;
+
+		// =========================
+		// RAYS UPDATE + DRAW
+		// =========================
+		glColor3f(1, 1, 1);
+		glLineWidth(1.0f);
+
+		for (auto& r : rays)
+		{
+			update(dt, r, blackHole);
+
+			glBegin(GL_LINE_STRIP);
+			for (auto& p : r.getTrail())
+				glVertex3fv(&p.x);
+			glEnd();
+
+			r.addPoint(r.pos());
+		}
+
+		glfwSwapBuffers(window);
+	}
+
+	glfwTerminate();
+	return 0;
 }

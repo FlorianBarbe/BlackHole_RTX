@@ -17,8 +17,8 @@ void update(float dt, rayon& r, const cercle& c)
 	glm::vec3 pos = r.pos();
 	glm::vec3 dir = r.dir();
 
-	const float G = 1.0f;
-	const float c_light = 1.0f;
+	const float G = 100.0f;
+	const float c_light = 10.0f;
 
 	glm::vec3 diff = pos - glm::vec3(c.cx, c.cy, c.cz);
 	float R = glm::length(diff);

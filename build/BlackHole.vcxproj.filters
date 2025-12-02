@@ -24,5 +24,16 @@
     <Filter Include="Source Files">
       <UniqueIdentifier>{14AC03B6-5091-313E-B708-8AD2040649E0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="data">
+      <UniqueIdentifier>{71b76199-5048-45eb-b9ac-c6f1c39078a1}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\data\Capture d%27écran 2025-12-02 222558.png">
+      <Filter>data</Filter>
+    </Image>
+    <Image Include="..\data\capture1.png">
+      <Filter>data</Filter>
+    </Image>
   </ItemGroup>
 </Project>
