@@ -12,33 +12,45 @@
 
 void update(float dt, rayon& r, const cercle& c)
 {
-    if (r.isAbsorbed()) return;
+	if (r.isAbsorbed()) return;
 
-    glm::vec3 pos = r.pos();
-    glm::vec3 dir = r.dir();
+	glm::vec3 pos = r.pos();
+	glm::vec3 dir = r.dir();
 
-    // distance au trou noir
-    glm::vec3 diff = pos - glm::vec3(c.cx, c.cy, c.cz);
-    float R = glm::length(diff);
+	const float G = 1.0f;
+	const float c_light = 1.0f;
 
-    // absorption ?
-    if (R < c.rayon)
-    {
-        r.setAbsorbed(true);
-        return;
-    }
+	glm::vec3 diff = pos - glm::vec3(c.cx, c.cy, c.cz);
+	float R = glm::length(diff);
 
-    // gravité newtonienne 3D
-    float G = 1.0f;
-    glm::vec3 accel = -G * c.masse * diff / (R * R * R);
+	if (R < c.rayon)
+	{
+		r.setAbsorbed(true);
+		return;
+	}
 
-    // intégration Euler
-    dir += accel * dt;
-    pos += dir * dt;
+	const float Rs = 2.0f * G * c.masse / (c_light * c_light);
 
-    // mise à jour
-    r.dir() = dir;
-    r.pos() = pos;
+	glm::vec3 dirNorm = glm::normalize(dir);
+	glm::vec3 radial = diff / R;
+	glm::vec3 lateral = radial - glm::dot(radial, dirNorm) * dirNorm;
 
-    r.addPoint(pos);
+	glm::vec3 accel(0.0f);
+	float latLen = glm::length(lateral);
+
+	if (latLen > 1e-6f)
+	{
+		float strength = (G * c.masse) / (R * R);
+		float relativisticBoost = 1.0f + 1.5f * (Rs / R);
+		accel = -relativisticBoost * strength * (lateral / latLen);
+	}
+
+	dir += accel * dt;
+	dir = glm::normalize(dir) * c_light;
+	pos += dir * dt;
+
+	r.dir() = dir;
+	r.pos() = pos;
+	r.addPoint(pos);
 }
+
