@@ -19,10 +19,12 @@ link_directories(
 
 # --- Source files ---
 set(SRC_FILES
-    src/main_gpu.cpp
+    "src/main_gpu.cpp.disabled"
     src/cercle.cpp
     src/rayon.cpp
     src/utilities.cpp
+    src/black_hole.cpp
+
 )
 
 add_executable(BlackHole ${SRC_FILES})
@@ -32,7 +34,7 @@ add_definitions(-DGLEW_STATIC)
 
 # --- Linking ---
 target_link_libraries(BlackHole
-    glew32s        # GLEW static release (x64)
+    glew32s
     glfw3
     opengl32
 )

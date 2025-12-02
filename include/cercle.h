@@ -1,4 +1,5 @@
 #pragma once
+#include <glm/glm.hpp>
 
 class cercle {
 public:
@@ -10,12 +11,11 @@ public:
 
     cercle(float x, float y, float z, float R, float M)
         : cx(x), cy(y), cz(z), rayon(R), masse(M),
-        r(1.0f), g(1.0f), b(1.0f) {
+        r(1.0f), g(1.0f), b(1.0f)
+    {
     }
 
     void draw3D() const;
 
     float getRayon() const { return rayon; }
-
 };
-

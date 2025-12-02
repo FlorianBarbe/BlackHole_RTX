@@ -3,10 +3,10 @@
 #include <glm/glm.hpp>
 
 class rayon {
-private:
-    glm::vec3 origin;
-    glm::vec3 direction;
-    glm::vec3 color;
+public:
+    glm::vec3 origin;     // <-- position actuelle du rayon
+    glm::vec3 direction;  // <-- direction du rayon
+    glm::vec3 color;      // <-- couleur (optionnel)
 
     std::vector<glm::vec3> trail;
     bool absorbed = false;
@@ -18,7 +18,7 @@ public:
         trail.push_back(o);
     }
 
-    // GETTERS / SETTERS
+    // GETTERS / SETTERS SIMPLES
     glm::vec3& pos() { return origin; }
     glm::vec3& dir() { return direction; }
 
