@@ -17,6 +17,12 @@ void update(float dt, rayon& r, const cercle& c)
     glm::vec3 pos = r.pos();
     glm::vec3 dir = r.dir();
 
+    // ------------------- Constantes physiques (unités réduites) -------------------
+    // On travaille en unités où c = 1 pour limiter les facteurs d'échelle. Le
+    // rayon de Schwarzschild (2GM / c^2) devient donc simplement 2 * G * masse.
+    const float G = 1.0f;
+    const float c_light = 1.0f;
+
     // distance au trou noir
     glm::vec3 diff = pos - glm::vec3(c.cx, c.cy, c.cz);
     float R = glm::length(diff);
@@ -28,12 +34,29 @@ void update(float dt, rayon& r, const cercle& c)
         return;
     }
 
-    // gravité newtonienne 3D
-    float G = 1.0f;
-    glm::vec3 accel = -G * c.masse * diff / (R * R * R);
+    // Modèle relativiste simplifié (Schwarzschild, trajectoire nulle) :
+    // - on ne modifie que la direction (vitesse ~ c), l'accélération est
+    //   appliquée orthogonalement au rayon pour courber sa trajectoire.
+    // - la force est renforcée près de l'horizon (facteur (1 + 1.5 * Rs / R)).
+    // - on renormalise la vitesse pour conserver |v| = c.
+    const float Rs = 2.0f * G * c.masse / (c_light * c_light);
 
-    // intégration Euler
+    glm::vec3 dirNorm = glm::normalize(dir);
+    glm::vec3 radial = diff / R;
+    glm::vec3 lateral = radial - glm::dot(radial, dirNorm) * dirNorm; // composante perpendiculaire
+
+    glm::vec3 accel(0.0f);
+    float latLen = glm::length(lateral);
+    if (latLen > 1e-6f)
+    {
+        float strength = (G * c.masse) / (R * R);
+        float relativisticBoost = 1.0f + 1.5f * (Rs / R);
+        accel = -relativisticBoost * strength * (lateral / latLen);
+    }
+
+    // intégration Euler + renormalisation (|dir| = c)
     dir += accel * dt;
+    dir = glm::normalize(dir) * c_light;
     pos += dir * dt;
 
     // mise à jour
