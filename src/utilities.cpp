@@ -1,56 +1,98 @@
 ﻿#define _USE_MATH_DEFINES
 #include <cmath>
+#include <algorithm>
 #include <glm/glm.hpp>
 
 #include "utilities.h"
 #include "rayon.h"
 #include "cercle.h"
 
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
+
 // ---------------------------------------------------------
-//   PHYSIQUE 3D : update du rayon
+//   KERR AVEC AXE DE ROTATION CHOISISSABLE
+//   spinAxis : axe de spin du trou noir (normalisé)
+//   On ne fait QUE la physique ici.
 // ---------------------------------------------------------
 
 void update(float dt, rayon& r, const cercle& c)
 {
 	if (r.isAbsorbed()) return;
 
+	// ==================== POSITION & DIRECTION ====================
 	glm::vec3 pos = r.pos();
-	glm::vec3 dir = r.dir();
+	glm::vec3 dir = glm::normalize(r.dir());
 
-	const float G = 100.0f;
-	const float c_light = 10.0f;
+	glm::vec3 center(c.cx, c.cy, c.cz);
 
-	glm::vec3 diff = pos - glm::vec3(c.cx, c.cy, c.cz);
+	// ==================== PARAMÈTRES KERR ====================
+	float Rs = c.rayon;    // rayon de Schwarzschild (graphique)
+	float M = 0.5f * Rs;  // G = c = 1 → Rs = 2M → M = Rs/2
+	float a = 1.80f * M;  // spin (modulable)
+
+	// ==================== AXE DE SPIN ====================
+	// Ici: rotation autour de l’axe Y
+	glm::vec3 spinAxis = glm::normalize(glm::vec3(0.0f, 1.0f, 0.0f));
+
+	// ==================== GÉOMÉTRIE ====================
+	glm::vec3 diff = pos - center;
 	float R = glm::length(diff);
 
-	if (R < c.rayon)
-	{
+	// Absorption : horizon
+	if (R < Rs) {
 		r.setAbsorbed(true);
 		return;
 	}
 
-	const float Rs = 2.0f * G * c.masse / (c_light * c_light);
-
-	glm::vec3 dirNorm = glm::normalize(dir);
 	glm::vec3 radial = diff / R;
-	glm::vec3 lateral = radial - glm::dot(radial, dirNorm) * dirNorm;
 
-	glm::vec3 accel(0.0f);
-	float latLen = glm::length(lateral);
+	// ============================================
+	// Composante latérale (courbure type Schwarzschild)
+	// ============================================
+	glm::vec3 lateral = radial - glm::dot(radial, dir) * dir;
+	float latLen2 = glm::dot(lateral, lateral);
 
-	if (latLen > 1e-6f)
-	{
-		float strength = (G * c.masse) / (R * R);
-		float relativisticBoost = 1.0f + 1.5f * (Rs / R);
-		accel = -relativisticBoost * strength * (lateral / latLen);
+	float grav = M / (R * R);
+	float boost = 1.0f + 1.5f * (Rs / R);
+	boost = std::min(boost, 50.0f);
+
+	glm::vec3 accel_lat(0.0f);
+	if (latLen2 > 1e-10f)
+		accel_lat = -boost * grav * (lateral / std::sqrt(latLen2));
+
+	// ============================================
+	// FRAME DRAGGING (KERR)
+	// ============================================
+	glm::vec3 tangent = glm::cross(spinAxis, radial);
+	float tlen = glm::length(tangent);
+	if (tlen < 1e-10f) {
+		tangent = glm::cross(spinAxis, diff);
+		tlen = glm::length(tangent);
 	}
+	if (tlen > 1e-10f)
+		tangent /= tlen;
+	else
+		tangent = glm::vec3(0.0f, 0.0f, 0.0f);
 
+	// terme de frame dragging ~ aM / R^3
+	float fd = (2.0f * a * M) / (R * R * R);
+	glm::vec3 accel_fd = fd * tangent;
+
+	// ============================================
+	// ACCÉLÉRATION TOTALE
+	// ============================================
+	glm::vec3 accel = accel_lat + accel_fd;
+
+	// ==================== MAJ DIRECTION ====================
 	dir += accel * dt;
-	dir = glm::normalize(dir) * c_light;
+	dir = glm::normalize(dir);
+
+	// ==================== MAJ POSITION ====================
 	pos += dir * dt;
 
-	r.dir() = dir;
 	r.pos() = pos;
-	r.addPoint(pos);
+	r.dir() = dir;
+	r.addPoint(pos);  // facultatif, utile si tu veux garder la "trail"
 }
-

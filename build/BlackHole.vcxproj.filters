@@ -13,6 +13,12 @@
     <ClCompile Include="C:\Users\flole\source\repos\BlackHole_RTX\src\black_hole.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="rtx.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="rtx_fast.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="C:\Users\flole\source\repos\BlackHole_RTX\CMakeLists.txt" />
@@ -27,6 +33,9 @@
     <Filter Include="data">
       <UniqueIdentifier>{71b76199-5048-45eb-b9ac-c6f1c39078a1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="include">
+      <UniqueIdentifier>{b8a2d7b8-e8e9-48b2-b42b-d08c6be4f1c2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\data\Capture d%27écran 2025-12-02 222558.png">
@@ -35,5 +44,25 @@
     <Image Include="..\data\capture1.png">
       <Filter>data</Filter>
     </Image>
+    <Image Include="ciel.jpg">
+      <Filter>data</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\include\cercle.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\raygen.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\rayon.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\utilities.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\stb_image.h">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

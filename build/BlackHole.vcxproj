@@ -321,12 +321,18 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="rtx.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="rtx_fast.cpp" />
     <None Include="C:\Users\flole\source\repos\BlackHole_RTX\src\main_gpu.cpp.disabled">
     </None>
     <ClCompile Include="C:\Users\flole\source\repos\BlackHole_RTX\src\cercle.cpp" />
     <ClCompile Include="C:\Users\flole\source\repos\BlackHole_RTX\src\rayon.cpp" />
     <ClCompile Include="C:\Users\flole\source\repos\BlackHole_RTX\src\utilities.cpp" />
-    <ClCompile Include="C:\Users\flole\source\repos\BlackHole_RTX\src\black_hole.cpp" />
+    <ClCompile Include="C:\Users\flole\source\repos\BlackHole_RTX\src\black_hole.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="C:\Users\flole\source\repos\BlackHole_RTX\build\ZERO_CHECK.vcxproj">
@@ -339,6 +345,14 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
   <ItemGroup>
     <Image Include="..\data\Capture d%27écran 2025-12-02 222558.png" />
     <Image Include="..\data\capture1.png" />
+    <Image Include="ciel.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\include\cercle.h" />
+    <ClInclude Include="..\include\raygen.h" />
+    <ClInclude Include="..\include\rayon.h" />
+    <ClInclude Include="..\include\stb_image.h" />
+    <ClInclude Include="..\include\utilities.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
