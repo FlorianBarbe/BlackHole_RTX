@@ -13,27 +13,37 @@ include_directories(
 
 # --- Library paths ---
 link_directories(
+    ${PROJECT_SOURCE_DIR}/libs/glew
     ${PROJECT_SOURCE_DIR}/libs/glew/lib/x64
     ${PROJECT_SOURCE_DIR}/libs/glfw/lib-vc2022
 )
 
-# --- Source files ---
-set(SRC_FILES
-    "src/main_gpu.cpp.disabled"
-    src/cercle.cpp
-    src/rayon.cpp
-    src/utilities.cpp
-    src/black_hole.cpp
-
-)
-
-add_executable(BlackHole ${SRC_FILES})
-
 # --- Static GLEW ---
 add_definitions(-DGLEW_STATIC)
 
-# --- Linking ---
-target_link_libraries(BlackHole
+# ================= EXECUTABLE (BlackHole_RTX) =================
+add_executable(BlackHole_RTX 
+    src/black_hole.cpp 
+    src/utilities.cpp 
+    src/cercle.cpp 
+    src/rayon.cpp
+)
+
+target_link_libraries(BlackHole_RTX
+    glew32s
+    glfw3
+    opengl32
+)
+
+# ================= EXECUTABLE (BlackHole_BTZ) =================
+add_executable(BlackHole_BTZ 
+    src/main_btz.cpp 
+    src/utilities.cpp 
+    src/cercle.cpp 
+    src/rayon.cpp
+)
+
+target_link_libraries(BlackHole_BTZ
     glew32s
     glfw3
     opengl32

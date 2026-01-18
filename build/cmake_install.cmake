@@ -1,8 +1,8 @@
-# Install script for directory: C:/Users/flole/source/repos/BlackHole_RTX
+# Install script for directory: C:/Users/flole/Desktop/trou noir/BlackHole_RTX
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
-  set(CMAKE_INSTALL_PREFIX "C:/Program Files (x86)/BlackHole")
+  set(CMAKE_INSTALL_PREFIX "C:/Program Files/BlackHole")
 endif()
 string(REGEX REPLACE "/$" "" CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}")
 
@@ -40,5 +40,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "C:/Users/flole/source/repos/BlackHole_RTX/build/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "C:/Users/flole/Desktop/trou noir/BlackHole_RTX/build/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")

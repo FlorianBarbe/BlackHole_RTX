@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\Users\flole\Desktop\trou noir\BlackHole_RTX\src\main_btz.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\flole\Desktop\trou noir\BlackHole_RTX\src\utilities.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\flole\Desktop\trou noir\BlackHole_RTX\src\cercle.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\flole\Desktop\trou noir\BlackHole_RTX\src\rayon.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\flole\Desktop\trou noir\BlackHole_RTX\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{040CE1AE-BE52-3EA0-A778-92A7B03DD4BE}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
